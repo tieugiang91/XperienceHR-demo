@@ -1,0 +1,14 @@
+package com.xperiencehr.timetracking.domain.model;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class WorkHoursReport {
+    private String employeeName;
+    private String projectName;
+    private Double totalHours;
+}
