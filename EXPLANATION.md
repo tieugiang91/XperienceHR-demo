@@ -96,13 +96,12 @@ ORDER BY
 ![EXPLAIN ANALYZE after refactor showing hash aggregate and hash joins](src/main/resources/images/img.png)
 
 **Analysis of New Query:**
-- **Result**: Performance improves significantly (reduced to ~200-500ms).
+- **Result**: Performance improves significantly: 21 m
 - **Reasoning**: The database uses a Hash Join. It loads the relevant employees and projects into memory once and maps them to the time records. This eliminates the N+1 problem.
 - **Remaining Issue**: The query still performs a Sequential Scan on time_record because there is no way to jump directly to the "last 1 month" records.
 
 
-### 4. Physical Optimization (Indexing Strategy)
-
+### 4. Physical Optimization (Indexing Strategy)s
 To achieve sub-millisecond responses, we must support the specific access patterns of the query with indexes.
 
 **Index Application:**
@@ -118,6 +117,6 @@ CREATE INDEX idx_time_record_project_id ON time_record(project_id);
 - **idx_time_record_employee_id & _project_id**: These are Foreign Keys. Indexing them facilitates fast Nested Loop Joins or Merge Joins by allowing the database to look up associated entities instantly.
 
 **Final Result (Post-Indexing):**
-- **Execution Time**: < 5ms
+- **Execution Time**: a bit faster
 - **Plan**: Index Scan on time_from → Nested Loop Join to employee/project.
 - **Conclusion**: The combination of Set-based logic (JOINs) and physical access paths (Indexes) results in optimal performance.
