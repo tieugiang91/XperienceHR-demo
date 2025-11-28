@@ -2,9 +2,9 @@ package com.xperiencehr.timetracking.application.service;
 
 import com.xperiencehr.timetracking.domain.model.PageResult;
 import com.xperiencehr.timetracking.domain.model.WorkHoursReport;
-import com.xperiencehr.timetracking.domain.port.EmployeeRepository;
-import com.xperiencehr.timetracking.domain.port.ReportService;
-import com.xperiencehr.timetracking.domain.port.TimeRecordRepository;
+import com.xperiencehr.timetracking.domain.port.in.ReportService;
+import com.xperiencehr.timetracking.domain.port.out.EmployeeRepository;
+import com.xperiencehr.timetracking.domain.port.out.TimeRecordRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

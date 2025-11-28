@@ -1,4 +1,4 @@
-package com.xperiencehr.timetracking.domain.port;
+package com.xperiencehr.timetracking.domain.port.out;
 
 import com.xperiencehr.timetracking.domain.model.PageResult;
 import com.xperiencehr.timetracking.domain.model.WorkHoursReport;

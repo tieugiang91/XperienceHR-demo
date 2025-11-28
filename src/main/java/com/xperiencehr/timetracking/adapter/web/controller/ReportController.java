@@ -5,7 +5,7 @@ import com.xperiencehr.timetracking.adapter.web.dto.WorkHoursReportPageDTO;
 import com.xperiencehr.timetracking.adapter.web.mapper.WorkHoursReportMapper;
 import com.xperiencehr.timetracking.domain.model.PageResult;
 import com.xperiencehr.timetracking.domain.model.WorkHoursReport;
-import com.xperiencehr.timetracking.domain.port.ReportService;
+import com.xperiencehr.timetracking.domain.port.in.ReportService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;

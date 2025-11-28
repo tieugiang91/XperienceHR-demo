@@ -3,7 +3,7 @@ package com.xperiencehr.timetracking.adapter.persistence;
 import com.xperiencehr.timetracking.adapter.persistence.mapper.EmployeeMapper;
 import com.xperiencehr.timetracking.adapter.persistence.repository.JpaEmployeeRepository;
 import com.xperiencehr.timetracking.domain.model.Employee;
-import com.xperiencehr.timetracking.domain.port.EmployeeRepository;
+import com.xperiencehr.timetracking.domain.port.out.EmployeeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
