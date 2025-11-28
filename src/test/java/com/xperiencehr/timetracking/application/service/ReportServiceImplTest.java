@@ -1,9 +1,10 @@
 package com.xperiencehr.timetracking.application.service;
 
-import com.xperiencehr.timetracking.adapter.persistence.repository.JpaEmployeeRepository;
+import com.xperiencehr.timetracking.domain.model.Employee;
+import com.xperiencehr.timetracking.domain.model.PageResult;
 import com.xperiencehr.timetracking.domain.model.WorkHoursReport;
+import com.xperiencehr.timetracking.domain.port.EmployeeRepository;
 import com.xperiencehr.timetracking.domain.port.TimeRecordRepository;
-import com.xperiencehr.timetracking.adapter.persistence.entity.EmployeeEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,6 +13,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,7 +28,7 @@ class ReportServiceImplTest {
     private TimeRecordRepository timeRecordRepository;
 
     @Mock
-    private JpaEmployeeRepository employeeRepository;
+    private EmployeeRepository employeeRepository;
 
     @InjectMocks
     private ReportServiceImpl reportService;
@@ -42,37 +44,50 @@ class ReportServiceImplTest {
 
     @Test
     void generateReport_returnsAllResultsForAdmin() {
-        List<WorkHoursReport> expected = List.of(new WorkHoursReport("Alice", "Project X", 40.0));
-        when(timeRecordRepository.findWorkHoursReport(startDate, endDate)).thenReturn(expected);
+        PageResult<WorkHoursReport> expected = PageResult.<WorkHoursReport>builder()
+                .content(List.of(new WorkHoursReport("Alice", "Project X", 40.0)))
+                .page(0)
+                .size(20)
+                .totalElements(1)
+                .totalPages(1)
+                .build();
+        when(timeRecordRepository.findWorkHoursReport(startDate, endDate, 0, 20)).thenReturn(expected);
 
-        List<WorkHoursReport> actual = reportService.generateReport(startDate, endDate, "admin", true);
+        PageResult<WorkHoursReport> actual = reportService.generateReport(startDate, endDate, "admin", true, 0, 20);
 
         assertThat(actual).isEqualTo(expected);
-        verify(timeRecordRepository).findWorkHoursReport(startDate, endDate);
+        verify(timeRecordRepository).findWorkHoursReport(startDate, endDate, 0, 20);
     }
 
     @Test
     void generateReport_returnsEmployeeResultsWhenUserFound() {
-        EmployeeEntity employee = new EmployeeEntity();
-        employee.setId(42L);
-        employee.setName("Bob");
+        Employee employee = new Employee(42L, "Bob");
         when(employeeRepository.findByName("Bob")).thenReturn(Optional.of(employee));
-        List<WorkHoursReport> expected = List.of(new WorkHoursReport("Bob", "Project Y", 12.5));
-        when(timeRecordRepository.findWorkHoursReportByEmployee(42L, startDate, endDate)).thenReturn(expected);
+        PageResult<WorkHoursReport> expected = PageResult.<WorkHoursReport>builder()
+                .content(List.of(new WorkHoursReport("Bob", "Project Y", 12.5)))
+                .page(1)
+                .size(10)
+                .totalElements(5)
+                .totalPages(1)
+                .build();
+        when(timeRecordRepository.findWorkHoursReportByEmployee(42L, startDate, endDate, 1, 10)).thenReturn(expected);
 
-        List<WorkHoursReport> actual = reportService.generateReport(startDate, endDate, "Bob", false);
+        PageResult<WorkHoursReport> actual = reportService.generateReport(startDate, endDate, "Bob", false, 1, 10);
 
         assertThat(actual).isEqualTo(expected);
-        verify(timeRecordRepository).findWorkHoursReportByEmployee(42L, startDate, endDate);
+        verify(timeRecordRepository).findWorkHoursReportByEmployee(42L, startDate, endDate, 1, 10);
     }
 
     @Test
     void generateReport_returnsEmptyListWhenEmployeeMissing() {
         when(employeeRepository.findByName("Charlie")).thenReturn(Optional.empty());
 
-        List<WorkHoursReport> actual = reportService.generateReport(startDate, endDate, "Charlie", false);
+        PageResult<WorkHoursReport> actual = reportService.generateReport(startDate, endDate, "Charlie", false, 0, 15);
 
-        assertThat(actual).isEmpty();
+        assertThat(actual.getContent()).isEmpty();
+        assertThat(actual.getTotalElements()).isZero();
+        assertThat(actual.getPage()).isZero();
+        assertThat(actual.getSize()).isEqualTo(15);
         verify(employeeRepository).findByName("Charlie");
     }
 }

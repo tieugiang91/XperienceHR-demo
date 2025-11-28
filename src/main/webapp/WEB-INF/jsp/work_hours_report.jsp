@@ -1,6 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -69,6 +70,7 @@
             </div>
             <div class="card-body">
                 <form action="/report" method="get" id="reportForm">
+                    <input type="hidden" name="page" id="pageField" value="0"/>
                     <div class="row g-3">
                         <div class="col-md-5">
                             <label for="startDate" class="form-label">Start Date</label>
@@ -79,6 +81,14 @@
                             <label for="endDate" class="form-label">End Date</label>
                             <input type="datetime-local" class="form-control" id="endDate" name="endDate" 
                                    value="${endDateInput}" required>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="size" class="form-label">Page Size</label>
+                            <select class="form-select" id="size" name="size">
+                                <c:forEach var="option" items="${pageSizeOptions}">
+                                    <option value="${option}" ${option == size ? 'selected' : ''}>${option}</option>
+                                </c:forEach>
+                            </select>
                         </div>
                         <div class="col-md-2 d-flex align-items-end">
                             <button type="submit" class="btn btn-primary w-100">
@@ -121,7 +131,7 @@
                             <tbody>
                                 <c:forEach var="record" items="${reportData}" varStatus="status">
                                     <tr>
-                                        <td>${status.index + 1}</td>
+                                        <td>${page * size + status.index + 1}</td>
                                         <td><strong>${record.employeeName}</strong></td>
                                         <td>${record.projectName}</td>
                                         <td class="text-end">
@@ -135,10 +145,46 @@
                             <tfoot>
                                 <tr class="table-secondary">
                                     <td colspan="3" class="text-end"><strong>Total Records:</strong></td>
-                                    <td class="text-end"><strong>${reportData.size()}</strong></td>
+                                    <td class="text-end"><strong>${totalRecords}</strong></td>
                                 </tr>
                             </tfoot>
                         </table>
+                    </div>
+                </c:if>
+                <c:if test="${reportPage.totalPages > 1}">
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <div>
+                            <c:set var="startRecord" value="${reportData.isEmpty() ? 0 : page * size + 1}" />
+                            <c:set var="endRecord" value="${page * size + reportData.size()}" />
+                            <span class="text-muted">
+                                Showing ${startRecord} - ${endRecord} of ${totalRecords} records
+                            </span>
+                        </div>
+                        <nav>
+                            <ul class="pagination mb-0">
+                                <c:url var="prevUrl" value="/report">
+                                    <c:param name="startDate" value="${startDateInput}"/>
+                                    <c:param name="endDate" value="${endDateInput}"/>
+                                    <c:param name="size" value="${size}"/>
+                                    <c:param name="page" value="${page - 1}"/>
+                                </c:url>
+                                <c:url var="nextUrl" value="/report">
+                                    <c:param name="startDate" value="${startDateInput}"/>
+                                    <c:param name="endDate" value="${endDateInput}"/>
+                                    <c:param name="size" value="${size}"/>
+                                    <c:param name="page" value="${page + 1}"/>
+                                </c:url>
+                                <li class="page-item ${!reportPage.hasPrevious ? 'disabled' : ''}">
+                                    <a class="page-link" href="${reportPage.hasPrevious ? prevUrl : '#'}">Previous</a>
+                                </li>
+                                <li class="page-item disabled">
+                                    <span class="page-link">Page ${page + 1} of ${totalPages}</span>
+                                </li>
+                                <li class="page-item ${!reportPage.hasNext ? 'disabled' : ''}">
+                                    <a class="page-link" href="${reportPage.hasNext ? nextUrl : '#'}">Next</a>
+                                </li>
+                            </ul>
+                        </nav>
                     </div>
                 </c:if>
             </div>
@@ -146,5 +192,10 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('reportForm').addEventListener('submit', function () {
+            document.getElementById('pageField').value = 0;
+        });
+    </script>
 </body>
 </html>
