@@ -73,12 +73,12 @@
                         <div class="col-md-5">
                             <label for="startDate" class="form-label">Start Date</label>
                             <input type="datetime-local" class="form-control" id="startDate" name="startDate" 
-                                   value="<fmt:formatDate value='${startDate}' pattern='yyyy-MM-dd'/>T00:00" required>
+                                   value="${startDateInput}" required>
                         </div>
                         <div class="col-md-5">
                             <label for="endDate" class="form-label">End Date</label>
                             <input type="datetime-local" class="form-control" id="endDate" name="endDate" 
-                                   value="<fmt:formatDate value='${endDate}' pattern='yyyy-MM-dd'/>T23:59" required>
+                                   value="${endDateInput}" required>
                         </div>
                         <div class="col-md-2 d-flex align-items-end">
                             <button type="submit" class="btn btn-primary w-100">

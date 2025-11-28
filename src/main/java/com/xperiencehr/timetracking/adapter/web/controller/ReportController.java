@@ -12,7 +12,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Controller
@@ -34,9 +37,13 @@ public class ReportController {
         log.info("Report request received from user: {}", authentication.getName());
 
         if (startDate == null || endDate == null) {
-            startDate = LocalDateTime.now().minusMonths(1);
-            endDate = LocalDateTime.now();
+            LocalDateTime now = LocalDateTime.now().withSecond(0).withNano(0);
+            startDate = LocalDateTime.of(LocalDate.now().minusMonths(1), LocalTime.MIN);
+            endDate = now;
             log.debug("Using default date range: {} to {}", startDate, endDate);
+        } else {
+            startDate = startDate.withSecond(0).withNano(0);
+            endDate = endDate.withSecond(0).withNano(0);
         }
 
         boolean isAdmin = authentication.getAuthorities()
@@ -45,9 +52,13 @@ public class ReportController {
         List<WorkHoursReport> reportData = reportService.generateReport(
                 startDate, endDate, authentication.getName(), isAdmin);
 
+        DateTimeFormatter dateTimeInputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
+
         model.addAttribute("reportData", reportData);
         model.addAttribute("startDate", startDate);
         model.addAttribute("endDate", endDate);
+        model.addAttribute("startDateInput", startDate.format(dateTimeInputFormatter));
+        model.addAttribute("endDateInput", endDate.format(dateTimeInputFormatter));
         model.addAttribute("username", authentication.getName());
         model.addAttribute("isAdmin", isAdmin);
 

@@ -22,6 +22,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests(auth -> auth
+                .dispatcherTypeMatchers(jakarta.servlet.DispatcherType.FORWARD).permitAll()
                 .requestMatchers("/login", "/error").permitAll()
                 .requestMatchers("/report").hasAnyRole("EMPLOYEE", "ADMIN")
                 .anyRequest().authenticated()
